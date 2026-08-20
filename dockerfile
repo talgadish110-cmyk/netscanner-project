@@ -1,9 +1,15 @@
-
-
-FROM python:3.9-alpine
+FROM python:3.8-alpine
 
 WORKDIR /app
 
-COPY scanner.py .
+COPY ./scanner.py .
 
-CMD ["python3", "scanner.py"]
+ COPY ./ips.txt .
+ 
+Install dependencies if needed
+
+RUN pip install requests
+
+ENTRYPOINT ["python3"]
+
+CMD ["scanner.py"]

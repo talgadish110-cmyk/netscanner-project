@@ -1,0 +1,4 @@
+[+] Starting Automated Security Pipeline at 2026-08-10_20-10-13
+[*] Starting scan on 8.8.8.8:53 at 2026-08-10 17:10:14.094204
+[+] SUCCESS: 8.8.8.8:53 is OPEN
+[!] ALERT: Open ports detected on target target-server!

@@ -1,0 +1,52 @@
+version: '3.8'
+
+
+
+services:
+
+  # Target server for testing
+
+  target-server:
+
+    image: nginx:alpine
+
+    container_name: vuln-target-server
+
+    ports:
+
+      - "8000:80"
+
+    networks:
+
+      - lab-net
+
+
+
+  # Our scanner/test container
+
+  security-scanner:
+
+    build: .
+
+    container_name: net-sentinel-scanner
+
+    depends_on:
+
+      - target-server
+
+    networks:
+
+      - lab-net
+
+    # Wait a few seconds for the server to come up, then run an automatic scan
+
+    command: ["sh", "-c", "sleep 2 && python3 port_scanner.py -t target-server -p 1-100"]
+
+
+
+networks:
+
+  lab-net:
+
+    driver: bridge
+
