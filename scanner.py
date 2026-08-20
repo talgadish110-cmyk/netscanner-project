@@ -1,47 +1,74 @@
-
 import socket
-
 import sys
-
+import json
+import argparse
+import threading
 from datetime import datetime
 
+parser = argparse.ArgumentParser(description="Multi-Target Network Port Scanner with Threading")
+parser.add_argument("-t", "--targets", default="targets.txt", help="Path to the targets file")
+parser.add_argument("-p", "--ports", nargs="+", type=int, default=[21, 22, 80, 443, 8080], help="List of ports to scan")
+args = parser.parse_args()
+
+targets_file = args.targets
+ports_to_scan = args.ports
+
+scan_results = {
+    "timestamp": str(datetime.now()),
+    "scans": []
+}
 
 
-def check_port(ip, port):
+print("-" * 50)
+print("Starting Multi-Target Threaded Network Scanner...")
+print(f"Target file: {targets_file}")
+print(f"Ports to scan: {ports_to_scan}")
+print(f"Time started: {scan_results['timestamp']}")
+print("-" * 50)
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    s.settimeout(2)  
-
+def scan_port(target_host, port, target_data):
     try:
-
-        result = s.connect_ex((ip, port))
-
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(1.0)
+        result = s.connect_ex((target_host, port))
         if result == 0:
-
-            print(f"[+] SUCCESS: {ip}:{port} is OPEN")
-
+            status = "OPEN"
         else:
-
-            print(f"[-] CLOSED: {ip}:{port} is closed")
-
-    except Exception as e:
-
-        print(f"[!] ERROR: {e}")
-
-    finally:
-
+            status = "CLOSED"
+        target_data["ports"][port] = status
+        print(f"  Port {port}: {status}")
         s.close()
+    except socket.error:
+        target_data["ports"][port] = "ERROR"
+try:
+    with open(targets_file, "r") as f:
+        targets = [line.strip() for line in f if line.strip()]
+except FileNotFoundError:
+    print(f"[-] Error: The file {targets_file} was not found.")
+    sys.exit(1)
 
+for target_host in targets:
+    print(f"\nScanning target: {target_host}")
+    target_data = {
+        "target": target_host,
+        "ports": {}
+    }
+    
+    threads = []
+    for port in ports_to_scan:
+        t = threading.Thread(target=scan_port, args=(target_host, port, target_data))
+        threads.append(t)
+        t.start()
+        
+    for t in threads:
+        t.join()
+        
+    scan_results["scans"].append(target_data)
 
-
-if __name__ == "__main__":
-
-    target_ip = "8.8.8.8"
-
-    target_port = 53
-
-    print(f"[*] Starting scan on {target_ip}:{target_port} at {datetime.now()}")
-
-    check_port(target_ip, target_port)
-
+try:
+    with open("results.json", "w") as json_file:
+        json.dump(scan_results, json_file, indent=4)
+    print("\n[+] All results successfully saved to results.json")
+except KeyboardInterrupt:
+    print("\nExiting script.")
+    sys.exit()
