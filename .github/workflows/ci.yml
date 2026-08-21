@@ -7,19 +7,19 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-  steps:
-  - name: Checkout Code
-    uses: actions/checkout@v3
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-  - name: Login to Docker Hub
-    uses: docker/login-action@v2
-    with:
-      username: ${{ secrets.DOCKERHUB_USERNAME }}
-      password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  - name: Build and Push Docker Image
-    uses: docker/build-push-action@v4
-    with:
-      context: .
-      push: true
-      tags: ${{ secrets.DOCKERHUB_USERNAME }}/netscanner-project:latest
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/netscanner-project:latest
