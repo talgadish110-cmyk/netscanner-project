@@ -1,0 +1,12 @@
+--- Recon Report for 192.168.1.100 ---
+
+[-] Port 21 is CLOSED or FILTERED
+[+] Port 22 is OPEN
+[+] Port 80 is OPEN
+    [->] Banner: HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Mon, 24 Aug 2026 08:16:49 GMT
+Content-Length: 19
+[+] Port 443 is OPEN
+[-] Port 8080 is CLOSED or FILTERED
